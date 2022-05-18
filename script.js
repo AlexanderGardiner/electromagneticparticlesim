@@ -35,7 +35,7 @@ function Start() {
   } else {
     mainParticle.image = negative;
   }
-  mainMagneticField = new magneticField(0.0,100.0,1000.0,500.0,20.0);
+  mainMagneticField = new magneticField(0.0,100.0,1000.0,500.0,10.0);
   requestAnimationFrame(function() {
     Update(mainParticle,mainMagneticField,performance.now());
   });
@@ -72,7 +72,9 @@ function ClearCanvas() {
 }
 
 function DetectCollision(object1,object2) {
-
+  if (object1.y>100) {
+    return true
+  }
   if (object1.x + object1.width >= object2.x && object1.x + object1.width <= object2.x + 5 && object1.y + object1.height >= object2.y+1 && object1.y <= object2.y + object2.height-1) {
     return true;
   } 

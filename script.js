@@ -47,11 +47,11 @@ class electricField {
   }
 }
 function Start() {
-  mainParticle = new particle(0,100,30,30,100,-1);
+  mainParticle = new particle(0,300,30,30,100,-1);
   
-  mainMagneticField = new magneticField(100,100,700,200,10);
+  mainMagneticField = new magneticField(300,100,700,200,10);
 
-  mainElectricField = new electricField(300,200,700,200,10,1);
+  mainElectricField = new electricField(100,200,700,200,15,1);
   requestAnimationFrame(function() {
     Update(mainParticle,mainMagneticField,mainElectricField,performance.now());
   });
@@ -70,12 +70,12 @@ function Update(mainParticle,mainMagneticField, mainElectricField,lastTime) {
   mainParticle = UpdateVelocities(mainParticle,mainMagneticField,mainElectricField,deltaTime);
 
   viewCanvasCTX.fillStyle = "#FF0000";
-  viewCanvasCTX.globalAlpha = 0.05;
+  viewCanvasCTX.globalAlpha = 0.2;
   viewCanvasCTX.fillRect(mainMagneticField.x, viewCanvas.height-mainMagneticField.height-mainMagneticField.y, mainMagneticField.width, mainMagneticField.height)
   viewCanvasCTX.globalAlpha = 1;
 
   viewCanvasCTX.fillStyle = "#FFF000";
-  viewCanvasCTX.globalAlpha = 0.05;
+  viewCanvasCTX.globalAlpha = 0.2;
   viewCanvasCTX.fillRect(mainElectricField.x, viewCanvas.height-mainElectricField.height-mainElectricField.y, mainElectricField.width, mainElectricField.height)
   viewCanvasCTX.globalAlpha = 1;
 

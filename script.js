@@ -47,47 +47,60 @@ class electricField {
   }
 }
 function Start() {
-  mainParticle = new particle(0,300,30,30,100,-1);
-  
-  mainMagneticField = new magneticField(300,100,700,200,10);
+  let particle1 = new particle(0,300,30,30,100,-1);
+  let particle2 = new particle(0,300,30,30,100,1);
 
-  mainElectricField = new electricField(100,200,700,200,15,1);
+  particles.push(particle1);
+  particles.push(particle2);
+  let magneticField1 = new magneticField(300,100,700,200,10);
+
+  let electricField1 = new electricField(100,200,700,200,50,1);
   requestAnimationFrame(function() {
-    Update(mainParticle,mainMagneticField,mainElectricField,performance.now());
+    Update(particles,magneticField1,electricField1,performance.now());
   });
 }
-function Update(mainParticle,mainMagneticField, mainElectricField,lastTime) {
+function Update(particles,magneticField1, electricField1,lastTime) {
   currentTime = performance.now()
   deltaTime = (currentTime - lastTime)/18;
   
   ClearCanvas();
 
-  mainParticle.inMagneticField = DetectCollision(mainParticle,mainMagneticField)
-
-  mainParticle.inElectricField = DetectCollision(mainParticle,mainElectricField)
-
-
-  mainParticle = UpdateVelocities(mainParticle,mainMagneticField,mainElectricField,deltaTime);
-
   viewCanvasCTX.fillStyle = "#FF0000";
   viewCanvasCTX.globalAlpha = 0.2;
-  viewCanvasCTX.fillRect(mainMagneticField.x, viewCanvas.height-mainMagneticField.height-mainMagneticField.y, mainMagneticField.width, mainMagneticField.height)
+  viewCanvasCTX.fillRect(magneticField1.x, viewCanvas.height-magneticField1.height-magneticField1.y, magneticField1.width, magneticField1.height)
   viewCanvasCTX.globalAlpha = 1;
 
   viewCanvasCTX.fillStyle = "#FFF000";
   viewCanvasCTX.globalAlpha = 0.2;
-  viewCanvasCTX.fillRect(mainElectricField.x, viewCanvas.height-mainElectricField.height-mainElectricField.y, mainElectricField.width, mainElectricField.height)
-  viewCanvasCTX.globalAlpha = 1;
+  viewCanvasCTX.fillRect(electricField1.x, viewCanvas.height-electricField1.height-electricField1.y, electricField1.width, electricField1.height)
 
-  viewCanvasCTX.fillStyle = "#000000";
-  viewCanvasCTX.drawImage(mainParticle.image,mainParticle.x, viewCanvas.height-mainParticle.height-mainParticle.y, mainParticle.width, mainParticle.height)
+  for (let i = 0; i < particles.length; i++) { 
+    particles[i].inMagneticField = DetectCollision(particles[i],magneticField1)
+    particles[i].inElectricField = DetectCollision(particles[i],electricField1)
+    particles[i] = wallCollision(particles[i])
+    particles[i] = UpdateVelocities(particles[i],magneticField1,electricField1,deltaTime);
+
+    viewCanvasCTX.globalAlpha = 1;
+
+    viewCanvasCTX.fillStyle = "#000000";
+    viewCanvasCTX.drawImage(particles[i].image,particles[i].x, viewCanvas.height-particles[i].height-particles[i].y, particles[i].width, particles[i].height)
+    
+    particles[i].x+=particles[i].xVelocity*deltaTime;
+    particles[i].y+=particles[i].yVelocity*deltaTime;
+  }
+  /*particle1.inMagneticField = DetectCollision(particle1,magneticField1)
+
+  particle1.inElectricField = DetectCollision(particle1,electricField1)
   
-  mainParticle.x+=mainParticle.xVelocity*deltaTime;
-  mainParticle.y+=mainParticle.yVelocity*deltaTime;
+  particle1 = wallCollision(particle1);
+  particle1 = UpdateVelocities(particle1,magneticField1,electricField1,deltaTime);
+  */
+  
+  
 
   
   requestAnimationFrame(function() {
-    Update(mainParticle,mainMagneticField, mainElectricField,currentTime);
+    Update(particles,magneticField1, electricField1,currentTime);
   });
 }
 
@@ -103,30 +116,41 @@ function DetectCollision(object1,object2) {
   
   return false;
 }
-function UpdateVelocities(mainParticle, mainMagneticField,mainElectricField,deltaTime) {
-  if (mainParticle.inMagneticField) {
+function UpdateVelocities(particle1, magneticField1,electricField1,deltaTime) {
+  if (particle1.inMagneticField) {
   for (let i = 0; i < 200; i++) { 
-    let temp1 = (((mainParticle.yVelocity)/200)*mainMagneticField.strength * -mainParticle.charge)/mainParticle.mass;
-    let temp2 = (((-mainParticle.xVelocity)/200)*mainMagneticField.strength * -mainParticle.charge)/mainParticle.mass;
+    let temp1 = (((particle1.yVelocity)/200)*magneticField1.strength * -particle1.charge)/particle1.mass;
+    let temp2 = (((-particle1.xVelocity)/200)*magneticField1.strength * -particle1.charge)/particle1.mass;
     
 
-    mainParticle.xVelocity+=temp1*deltaTime 
-    mainParticle.yVelocity+=temp2 *deltaTime
+    particle1.xVelocity+=temp1*deltaTime 
+    particle1.yVelocity+=temp2 *deltaTime
    }
   }
-  if (mainParticle.inElectricField) {
-    if (mainElectricField.direction==1) {
-      mainParticle.yVelocity += (mainElectricField.strength * mainParticle.charge)/mainParticle.mass;
-    } else if (mainElectricField.direction==2) {
-      mainParticle.yVelocity -= (mainElectricField.strength * mainParticle.charge)/mainParticle.mass;
-    } else if (mainElectricField.direction==3) {
-      mainParticle.xVelocity += (mainElectricField.strength * mainParticle.charge)/mainParticle.mass;
-    } else if (mainElectricField.direction==4) {
-      mainParticle.xVelocity -= (mainElectricField.strength * mainParticle.charge)/mainParticle.mass;
+  if (particle1.inElectricField) {
+    if (electricField1.direction==1) {
+      particle1.yVelocity += (electricField1.strength * particle1.charge)/particle1.mass;
+    } else if (electricField1.direction==2) {
+      particle1.yVelocity -= (electricField1.strength * particle1.charge)/particle1.mass;
+    } else if (electricField1.direction==3) {
+      particle1.xVelocity += (electricField1.strength * particle1.charge)/particle1.mass;
+    } else if (electricField1.direction==4) {
+      particle1.xVelocity -= (electricField1.strength * particle1.charge)/particle1.mass;
     }
     
   }
-  return mainParticle
+  return particle1
 }
 
+function wallCollision(particle1) {
+  if (particle1.y<=0 || particle1.y>=viewCanvas.height) {
+    
+    particle1.yVelocity=particle1.yVelocity*-1;
+  }
+
+  if (particle1.x<=0 || particle1.x>=viewCanvas.width) {
+    particle1.xVelocity=particle1.xVelocity*-1;
+  }
+  return particle1
+}
 Start();

@@ -8,8 +8,8 @@ class particle {
   constructor(x,y,width, height, mass, charge) {
     this.x = x;
     this.y = y;
-    this.xVelocity = 0;
-    this.yVelocity = 5;
+    this.xVelocity = 5;
+    this.yVelocity = 0;
     this.width = width;
     this.height = height;
     this.mass = mass;
@@ -29,13 +29,13 @@ class magneticField {
   }
 }
 function Start() {
-  mainParticle = new particle(500.0,10.0,30.0,30.0,100.0,1.0);
+  mainParticle = new particle(0,100,30,30,100,-1);
   if (mainParticle.charge>0) {
     mainParticle.image = positive;
   } else {
     mainParticle.image = negative;
   }
-  mainMagneticField = new magneticField(0.0,100.0,1000.0,500.0,10.0);
+  mainMagneticField = new magneticField(100,100,700,200,10);
   requestAnimationFrame(function() {
     Update(mainParticle,mainMagneticField,performance.now());
   });
@@ -72,13 +72,14 @@ function ClearCanvas() {
 }
 
 function DetectCollision(object1,object2) {
-  if (object1.y>100) {
+  /*if (object1.y>100) {
     return true
-  }
-  if (object1.x + object1.width >= object2.x && object1.x + object1.width <= object2.x + 5 && object1.y + object1.height >= object2.y+1 && object1.y <= object2.y + object2.height-1) {
+  }*/
+  if (object1.x + object1.width >= object2.x && object1.x + object1.width <= object2.width+object2.x && object1.y + object1.height >= object2.y && object1.y <= object2.y + object2.height) {
     return true;
   } 
-  if (object1.x <= object2.x + object2.width && object1.x >= object2.x + (object2.width - 5) && object1.y + object1.height >= object2.y+1 && object1.y <= object2.y + object2.height-1) {
+  
+  /*if (object1.x <= object2.x + object2.width && object1.x +object1.width>= object2.x  && object1.y + object1.height >= object2.y+1 && object1.y <= object2.y + object2.height-1) {
     return true;
   }
 
@@ -89,14 +90,14 @@ function DetectCollision(object1,object2) {
   if (object1.y <= object2.y + object2.height && object1.y >= object2.y + (object2.height-5) && object1.x + object1.width >= object2.x+1 && object1.x <= object2.x + object2.width-1) {
     return true;
 
-  }
+  }*/
   return false;
 }
 function UpdateVelocities(mainParticle, mainMagneticField,deltaTime) {
   if (mainParticle.inMagneticField) {
   for (let i = 0; i < 200; i++) { 
-    let temp1 = (((mainParticle.yVelocity)/200)*mainMagneticField.strength * mainParticle.charge)/mainParticle.mass;
-    let temp2 = (((-mainParticle.xVelocity)/200)*mainMagneticField.strength * mainParticle.charge)/mainParticle.mass;
+    let temp1 = (((mainParticle.yVelocity)/200)*mainMagneticField.strength * -mainParticle.charge)/mainParticle.mass;
+    let temp2 = (((-mainParticle.xVelocity)/200)*mainMagneticField.strength * -mainParticle.charge)/mainParticle.mass;
     
 
     mainParticle.xVelocity+=temp1*deltaTime 

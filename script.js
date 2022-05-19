@@ -4,7 +4,7 @@ let positive = document.getElementById("positive");
 let negative = document.getElementById("negative");
 let particles = [];
 let magneticFields = [];
-
+console.log("test")
 class particle {
   constructor(x,y,width, height, mass, charge,xVelocity,yVelocity) {
     this.x = x;
@@ -15,7 +15,7 @@ class particle {
     this.height = height;
     this.mass = mass;
     this.charge = charge;
-    this.inMagneticField = false;
+    this.inMagneticField = [];
     this.inElectricField = false;
     this.image;
     if (this.charge>0) {
@@ -47,42 +47,48 @@ class electricField {
   }
 }
 function Start() {
+  
   let particle1 = new particle(0,300,30,30,100,-1,5,8);
   let particle2 = new particle(0,300,30,30,100,0.5,5,-17);
 
   particles.push(particle1);
   particles.push(particle2);
-  let magneticField1 = new magneticField(300,100,500,350,10);
-
+  let magneticField1 = new magneticField(200,100,100,350,10);
+  let magneticField2 = new magneticField(400,100,100,350,10);
+  magneticFields.push(magneticField1,magneticField2);
   let electricField1 = new electricField(0,200,viewCanvas.width,150,30,1);
   requestAnimationFrame(function() {
-    Update(particles,magneticField1,electricField1,performance.now());
+    Update(particles,magneticFields,electricField1,performance.now());
   });
 }
-function Update(particles,magneticField1, electricField1,lastTime) {
+function Update(particles,magneticFields, electricField1,lastTime) {
   currentTime = performance.now()
   deltaTime = (currentTime - lastTime)/40;
   viewCanvasCTX.fillStyle = "#808080";
   viewCanvasCTX.globalAlpha = 0.07;
   viewCanvasCTX.fillRect(0, 0, viewCanvas.width, viewCanvas.height)
   viewCanvasCTX.globalAlpha = 1;
-  //ClearCanvas();
+  ClearCanvas();
 
   viewCanvasCTX.fillStyle = "#FF0000";
-  viewCanvasCTX.globalAlpha = 0.007;
-  viewCanvasCTX.fillRect(magneticField1.x, viewCanvas.height-magneticField1.height-magneticField1.y, magneticField1.width, magneticField1.height)
+  viewCanvasCTX.globalAlpha = 0.07;
+  for (let i=0; i<magneticFields.length;i++) {
+    viewCanvasCTX.fillRect(magneticFields[i].x, viewCanvas.height-magneticFields[i].height-magneticFields[i].y, magneticFields[i].width, magneticFields[i].height)
+  }
+  
   viewCanvasCTX.globalAlpha = 1;
 
   viewCanvasCTX.fillStyle = "#FFF000";
   viewCanvasCTX.globalAlpha = 0.07;
   viewCanvasCTX.fillRect(electricField1.x, viewCanvas.height-electricField1.height-electricField1.y, electricField1.width, electricField1.height)
-
+  
   for (let i = 0; i < particles.length; i++) { 
-    particles[i].inMagneticField = DetectCollision(particles[i],magneticField1)
-    particles[i].inElectricField = DetectCollision(particles[i],electricField1)
+    
+    particles[i].inMagneticField = DetectCollision(particles[i],magneticFields)
+    //particles[i].inElectricField = DetectCollision(particles[i],electricField1)
     particles[i] = wallCollision(particles[i])
-    particles[i] = UpdateVelocities(particles[i],magneticField1,electricField1,deltaTime);
-
+    particles[i] = UpdateVelocities(particles[i],magneticFields,electricField1,deltaTime);
+  
     viewCanvasCTX.globalAlpha = 1;
 
     viewCanvasCTX.fillStyle = "#000000";
@@ -90,6 +96,7 @@ function Update(particles,magneticField1, electricField1,lastTime) {
     
     particles[i].x+=particles[i].xVelocity*deltaTime;
     particles[i].y+=particles[i].yVelocity*deltaTime;
+    
   }
 
   
@@ -97,8 +104,8 @@ function Update(particles,magneticField1, electricField1,lastTime) {
 
   
   requestAnimationFrame(function() {
-    Update(particles,magneticField1, electricField1,currentTime);
-  });
+    Update(particles,magneticFields, electricField1,currentTime);
+  });//*/
 }
 
 function ClearCanvas() {
@@ -107,22 +114,34 @@ function ClearCanvas() {
 
 function DetectCollision(object1,object2) {
 
-  if (object1.x + object1.width >= object2.x && object1.x + object1.width <= object2.width+object2.x && object1.y + object1.height >= object2.y && object1.y <= object2.y + object2.height) {
-    return true;
-  } 
-  
-  return false;
-}
-function UpdateVelocities(particle1, magneticField1,electricField1,deltaTime) {
-  if (particle1.inMagneticField) {
-  for (let i = 0; i < 200; i++) { 
-    let temp1 = (((particle1.yVelocity)/200)*magneticField1.strength * -particle1.charge)/particle1.mass;
-    let temp2 = (((-particle1.xVelocity)/200)*magneticField1.strength * -particle1.charge)/particle1.mass;
-    
+  let collisions = [];
 
-    particle1.xVelocity+=temp1*deltaTime 
-    particle1.yVelocity+=temp2 *deltaTime
-   }
+  for (let i = 0; i < object2.length; i++) { 
+    
+    //if statement crashing
+    if (object1.x + object1.width >= object2[i].x && object1.x + object1.width <= object2[i].width+object2[i].x && object1.y + object1.height >= object2[i].y && object1.y <= object2[i].y + object2[i].height) {
+
+      collisions.push(object2[i])
+      
+    } 
+    
+    
+  }
+  
+  
+  return collisions;
+}
+function UpdateVelocities(particle1, magneticFields,electricField1,deltaTime) {
+  
+  for (let j=0;j<particle1.inMagneticField.length;j++) {
+  
+    for (let i = 0; i < 200; i++) { 
+      let temp1 = (((particle1.yVelocity)/200)*particle1.inMagneticField[j].strength * -particle1.charge)/particle1.mass;
+      let temp2 = (((-particle1.xVelocity)/200)*particle1.inMagneticField[j].strength * -particle1.charge)/particle1.mass;
+  
+      particle1.xVelocity+=temp1*deltaTime 
+      particle1.yVelocity+=temp2 *deltaTime
+     }
   }
   if (particle1.inElectricField) {
     if (electricField1.direction==1) {
@@ -136,6 +155,7 @@ function UpdateVelocities(particle1, magneticField1,electricField1,deltaTime) {
     }
     
   }
+
   return particle1
 }
 

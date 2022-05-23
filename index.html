@@ -10,9 +10,35 @@
 
 <body>
   <canvas id="viewCanvas" style="border:5px solid #d3d3d3;" width="1000" height="660">
+    <div id="images">
+      <img id="positive" src="Positive.png">
+      <img id="negative" src="Negative.png">
+    </div>
+  </canvas>
+  <div id="particleInput">
+    <h3>Spawn Particle</h3>
+    <input type="number" placeholder="Charge magnitude" id="chargeMagnitude">
+    <br>
+    <input type="number" placeholder="Mass" id="mass">
+    <br>
+    <input type="number" placeholder="Size" id="size">
+    <br>
+    <input type="number" placeholder="X Velocity" id="xVelocity">
+    <br>
+    <input type="number" placeholder="Y Velocity" id="yVelocity">
+    <br>
+    <input type="number" placeholder="Number of particles" id="numParticles">
+    <br>
+    <input type="button" onclick="setParticleParameters()" value="Set Parameters">
+    <br>
+    <input type="button" onclick="clearParticles()" value="Clear">
+    <br>
+    <input type="button" onclick="toggleCanvasRefresh()" value="Toggle canvas refresh">
+    <h4 id="numParticlesOutput">Total number of particles: </h4>
+    <h4 id="fps">FPS: </h4>
+  </div>
     
-<img id="positive" src="Positive.png">
-    <img id="negative" src="Negative.png">
+  
   <script src="script.js"></script>
 </body>
 

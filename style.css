@@ -2,3 +2,18 @@ html, body {
   height: 100%;
   width: 100%;
 }
+
+#viewCanvas {
+  
+  left: 0px;
+}
+#images {
+  display: none;
+  visibility: hidden;
+}
+
+#particleInput {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}

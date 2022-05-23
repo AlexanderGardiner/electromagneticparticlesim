@@ -15,7 +15,7 @@
       <img id="negative" src="Negative.png">
     </div>
   </canvas>
-  <div id="particleInput">
+  <div id="rightInput">
     <h3>Spawn Particle</h3>
     <input type="number" placeholder="Charge magnitude" id="chargeMagnitude">
     <br>
@@ -33,10 +33,42 @@
     <br>
     <input type="button" onclick="clearParticles()" value="Clear">
     <br>
+    
+
+    <h3>Spawn Electric Field</h3>
+    <input type="number" placeholder="Width" id = "eFieldWidth">
+    <br>
+    <input type="number" placeholder="Height" id = "eFieldHeight">
+    <br>
+    <input type="number" placeholder="Strength" id = "eFieldStrength">
+    <br>
+    <input type="number" placeholder="Direction (1,2,3,4)" id = "eFieldDirection">
+    <br>
+    <input type="button" onclick="setElectricParameters()" value="Set Parameters">
+    <br>
+    <input type="button" onclick="clearElectricFields()" value="Clear">
+    <br>
+    <h3>Spawn Magnetic Field</h3>
+    <input type="number" placeholder="Width" id = "mFieldWidth">
+    <br>
+    <input type="number" placeholder="Height" id = "eFieldHeight">
+    <br>
+    <input type="number" placeholder="Strength" id = "eFieldStrength">
+    <br>
+    <input type="number" placeholder="Direction (1,2,3,4)" id = "eFieldDirection">
+    <br>
+    <input type="button" onclick="setElectricParameters()" value="Set Parameters">
+    <br>
+    <input type="button" onclick="clearElectricFields()" value="Clear">
+
+    <br>
+    <br>
     <input type="button" onclick="toggleCanvasRefresh()" value="Toggle canvas refresh">
     <h4 id="numParticlesOutput">Total number of particles: </h4>
     <h4 id="fps">FPS: </h4>
   </div>
+
+  
     
   
   <script src="script.js"></script>

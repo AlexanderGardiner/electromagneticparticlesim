@@ -12,7 +12,7 @@ html, body {
   visibility: hidden;
 }
 
-#particleInput {
+#rightInput {
   position: absolute;
   top: 5px;
   right: 5px;

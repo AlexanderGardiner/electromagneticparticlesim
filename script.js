@@ -9,14 +9,21 @@ let canvasRefresh=false;
 console.log("test")
 
 
-spawnParticleMagnitude=0;
-spawnParticleMass=0;
-spawnParticleSize=0;
-spawnParticleXVelocity=0;
-spawnParticleYVelocity=0;
-spawnParticleX = 0;
-spawnParticleY = 0;
-numParticles = 0;
+let spawnParticleMagnitude=0;
+let spawnParticleMass=0;
+let spawnParticleSize=0;
+let spawnParticleXVelocity=0;
+let spawnParticleYVelocity=0;
+let spawnParticleX = 0;
+let spawnParticleY = 0;
+let numParticles = 0;
+
+let spawnEFieldWidth=0;
+let spawnEFieldHeight=0;
+let spawnEFieldStrength=0;
+let spawnEFieldDirection=1;
+
+let objectToPlace = 0;
 viewCanvas.addEventListener('mousedown', function(e) {
     getCursorPosition(viewCanvas, e)
 })
@@ -32,31 +39,51 @@ function clearParticles() {
   particles.length=0;
   ClearCanvas();
 }
+
+function clearElectricFields() {
+  electricFields.length=0;
+
+  ClearCanvas();
+}
+
 function getCursorPosition(canvas, event) {
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
-  spawnParticleX = x;
-  spawnParticleY = y;
+  if (objectToPlace==0) {
+    for (i=0;i<numParticles;i++) {
+      particles.push(new particle(x +(i/(numParticles/200)),viewCanvas.height-(spawnParticleSize*30)-y-(i/(numParticles/80)),spawnParticleSize*30,spawnParticleSize*30,spawnParticleMass,spawnParticleMagnitude,parseFloat(spawnParticleXVelocity)/10,parseFloat(spawnParticleYVelocity)/10))
+    }
+  } else if (objectToPlace==1) {
+    electricFields.push(new electricField(x,viewCanvas.height-y,spawnEFieldWidth,spawnEFieldHeight,spawnEFieldStrength,spawnEFieldDirection))
 
-  for (i=0;i<numParticles;i++) {
-    particles.push(new particle(x +(i/(numParticles/200)),viewCanvas.height-(spawnParticleSize*30)-y-(i/(numParticles/80)),spawnParticleSize*30,spawnParticleSize*30,spawnParticleMass,spawnParticleMagnitude,parseFloat(spawnParticleXVelocity)/10,parseFloat(spawnParticleYVelocity)/10))
   }
+  
   
 
 
 }
 
 function setParticleParameters() {
-
-  spawnParticleMagnitude = document.getElementById('chargeMagnitude').value;
-  spawnParticleMass = document.getElementById('mass').value;
-  spawnParticleSize = document.getElementById('size').value;
-  spawnParticleXVelocity = document.getElementById('xVelocity').value;
-  spawnParticleYVelocity = document.getElementById('yVelocity').value;
-  numParticles = document.getElementById('numParticles').value;
+  objectToPlace=0;
+  spawnParticleMagnitude = parseFloat(document.getElementById('chargeMagnitude').value);
+  spawnParticleMass = parseFloat(document.getElementById('mass').value);
+  spawnParticleSize = parseFloat(document.getElementById('size').value);
+  spawnParticleXVelocity = parseFloat(document.getElementById('xVelocity').value);
+  spawnParticleYVelocity = parseFloat(document.getElementById('yVelocity').value);
+  numParticles = parseFloat(document.getElementById('numParticles').value);
   
 }
+
+function setElectricParameters() {
+  objectToPlace=1;
+  spawnEFieldWidth=parseFloat(document.getElementById("eFieldWidth").value);
+  spawnEFieldHeight=parseFloat(document.getElementById("eFieldHeight").value);
+  spawnEFieldStrength=parseFloat(document.getElementById("eFieldStrength").value);
+  spawnEFieldDirection=parseFloat(document.getElementById("eFieldDirection").value);
+
+}
+
 class particle {
   constructor(x,y,width, height, mass, charge,xVelocity,yVelocity) {
     this.x = x;
@@ -78,6 +105,7 @@ class particle {
 
   }
 }
+
 
 class magneticField {
   constructor(x,y,width,height,strength) {
@@ -164,7 +192,7 @@ function Update(particles,magneticFields, electricFields,lastTime) {
 
   
   
-
+  
   document.getElementById("numParticlesOutput").innerHTML = "Total particles: " + particles.length;
   document.getElementById("fps").innerHTML = "FPS: " + Math.round(1000/(deltaTime*40)).toFixed(2);
   requestAnimationFrame(function() {
@@ -182,7 +210,7 @@ function DetectCollision(object1,object2) {
   for (let i = 0; i < object2.length; i++) { 
     
 
-    if (object1.x + object1.width >= object2[i].x && object1.x + object1.width <= object2[i].width+object2[i].x && object1.y + object1.height >= object2[i].y && object1.y <= object2[i].y + object2[i].height) {
+    if (object1.x + object1.width >= object2[i].x && object1.x  <= object2[i].width+object2[i].x && object1.y + object1.height >= object2[i].y && object1.y <= object2[i].y + object2[i].height) {
 
       collisions.push(object2[i])
       

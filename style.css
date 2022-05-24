@@ -4,7 +4,8 @@ html, body {
 }
 
 #viewCanvas {
-  
+  width:1000px;
+  height:660px;
   left: 0px;
 }
 #images {

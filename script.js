@@ -29,15 +29,25 @@ let spawnMFieldStrength=0;
 
 let objectToPlace = 0;
 
+let particleAttraction = true;
 viewCanvas.addEventListener('mousedown', function(e) {
     getCursorPosition(viewCanvas, e)
 })
 
 function toggleCanvasRefresh() {
+  ClearCanvas();
   if (canvasRefresh) {
     canvasRefresh=false;
   } else {
     canvasRefresh=true;
+  }
+}
+
+function toggleParticleAttraction() {
+  if (particleAttraction) {
+    particleAttraction=false;
+  } else {
+    particleAttraction=true;
   }
 }
 function clearParticles() {
@@ -63,7 +73,7 @@ function getCursorPosition(canvas, event) {
   let y = event.clientY - rect.top;
   if (objectToPlace==0) {
     for (i=0;i<numParticles;i++) {
-      particles.push(new particle(x +(i/(numParticles/200)),viewCanvas.height-(spawnParticleSize*30)-y-(i/(numParticles/80)),spawnParticleSize*30,spawnParticleSize*30,spawnParticleMass,spawnParticleMagnitude,parseFloat(spawnParticleXVelocity)/10,parseFloat(spawnParticleYVelocity)/10))
+      particles.push(new particle(x +(i/(numParticles/200)),viewCanvas.height-(spawnParticleSize*30)-y,spawnParticleSize*30,spawnParticleSize*30,spawnParticleMass,spawnParticleMagnitude,parseFloat(spawnParticleXVelocity)/10,parseFloat(spawnParticleYVelocity)/10))
     }
   } else if (objectToPlace==1) {
     electricFields.push(new electricField(x,viewCanvas.height-y,spawnEFieldWidth,spawnEFieldHeight,spawnEFieldStrength,spawnEFieldDirection))
@@ -149,6 +159,7 @@ class electricField {
   }
 }
 function Start() {
+
   requestAnimationFrame(function() {
     Update(particles,magneticFields,electricFields,performance.now());
   });
@@ -157,7 +168,7 @@ function Update(particles,magneticFields, electricFields,lastTime) {
 
   currentTime = performance.now()
   deltaTime = (currentTime - lastTime)/40;
-  viewCanvasCTX.fillStyle = "#808080";
+  viewCanvasCTX.fillStyle = "#D3D3D3";
   viewCanvasCTX.globalAlpha = 0.07;
   viewCanvasCTX.fillRect(0, 0, viewCanvas.width, viewCanvas.height)
   viewCanvasCTX.globalAlpha = 1;
@@ -167,7 +178,12 @@ function Update(particles,magneticFields, electricFields,lastTime) {
 
 
   viewCanvasCTX.fillStyle = "#FF0000";
-  viewCanvasCTX.globalAlpha = 0.2;
+  if (canvasRefresh) {
+    viewCanvasCTX.globalAlpha = 0.7;
+  } else {
+    viewCanvasCTX.globalAlpha = 0.2;
+  }
+  
   for (let i=0; i<magneticFields.length;i++) {
     viewCanvasCTX.fillRect(magneticFields[i].x, viewCanvas.height-magneticFields[i].height-magneticFields[i].y, magneticFields[i].width, magneticFields[i].height)
   }
@@ -175,7 +191,11 @@ function Update(particles,magneticFields, electricFields,lastTime) {
   viewCanvasCTX.globalAlpha = 1;
 
   viewCanvasCTX.fillStyle = "#FFF000";
-  viewCanvasCTX.globalAlpha = 0.2;
+  if (canvasRefresh) {
+    viewCanvasCTX.globalAlpha = 0.7;
+  } else {
+    viewCanvasCTX.globalAlpha = 0.2;
+  }
   for (let i=0; i<electricFields.length;i++) {
     viewCanvasCTX.fillRect(electricFields[i].x, viewCanvas.height-electricFields[i].height-electricFields[i].y, electricFields[i].width, electricFields[i].height)
   }
@@ -185,20 +205,31 @@ function Update(particles,magneticFields, electricFields,lastTime) {
     viewCanvasCTX.globalAlpha = 1;
 
     viewCanvasCTX.fillStyle = "#000000";
+    if (particleAttraction) {
+      for (let l=0; l<particles.length;l++) {
+        if (l!=i) {
+          particles[i] = calculateForceOfTwoCharges(particles[i],particles[l]);
+        }
+      }
+    }
+    
     for (let j=0; j<4; j++) {
 
       particles[i].inMagneticField = DetectCollision(particles[i],magneticFields)
       particles[i].inElectricField = DetectCollision(particles[i],electricFields)
-      particles[i] = wallCollision(particles[i])
+      
       particles[i] = UpdateVelocities(particles[i],magneticFields,electricFields,deltaTime/4);
-  
+
+      
       
       
       particles[i].x+=particles[i].xVelocity*deltaTime/4;
       particles[i].y+=particles[i].yVelocity*deltaTime/4;
+      particles[i] = wallCollision(particles[i])
       
     }
     viewCanvasCTX.drawImage(particles[i].image,particles[i].x, viewCanvas.height-particles[i].height-particles[i].y, particles[i].width, particles[i].height)
+
     
     
   }
@@ -208,6 +239,7 @@ function Update(particles,magneticFields, electricFields,lastTime) {
   
   document.getElementById("numParticlesOutput").innerHTML = "Total particles: " + particles.length;
   document.getElementById("fps").innerHTML = "FPS: " + Math.round(1000/(deltaTime*40)).toFixed(2);
+  
   requestAnimationFrame(function() {
     Update(particles,magneticFields, electricFields,currentTime);
   });//*/
@@ -268,18 +300,41 @@ function wallCollision(particle1) {
   if (particle1.y<=0 ) {
     particle1.y=0;
     particle1.yVelocity=particle1.yVelocity*-1;
-  } else if (particle1.y>=viewCanvas.height) {
-    particle1.y=viewCanvas.height;
+  } else if (particle1.y>=630) {
+    particle1.y=630;
     particle1.yVelocity=particle1.yVelocity*-1;
   }
 
   if (particle1.x<=0 ) {
     particle.x=0;
     particle1.xVelocity=particle1.xVelocity*-1;
-  } else if (particle1.x>=viewCanvas.width) {
-    particle1.x=viewCanvas.width;
+  } else if (particle1.x>=970) {
+    particle1.x=970
     particle1.xVelocity=particle1.xVelocity*-1;
   }
   return particle1
+}
+
+function calculateForceOfTwoCharges(particle1,particle2) {
+  let charges = -(particle1.charge*particle2.charge)*1000
+  let distance = (Math.sqrt((Math.abs((particle2.x-particle1.x)**2))+Math.abs(((particle2.y-particle2.x)**2))))
+  let acceleration = (charges/distance/particle1.mass);
+  let angle = Math.abs(Math.atan((particle2.y-particle1.y)/(particle2.x-particle1.x)))
+  if (particle1.x>particle2.x) {
+    particle1.xVelocity += -acceleration * Math.cos(angle)
+  } else {
+    particle1.xVelocity += acceleration * Math.cos(angle)
+  }
+  
+
+
+  if (particle1.y>particle2.y) {
+    particle1.yVelocity += -acceleration * Math.sin(angle)
+  } else {
+    particle1.yVelocity += acceleration * Math.sin(angle)
+  }
+  
+
+  return (particle1)
 }
 Start();

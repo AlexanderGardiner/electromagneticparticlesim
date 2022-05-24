@@ -23,7 +23,12 @@ let spawnEFieldHeight=0;
 let spawnEFieldStrength=0;
 let spawnEFieldDirection=1;
 
+let spawnMFieldWidth=0;
+let spawnMFieldHeight=0;
+let spawnMFieldStrength=0;
+
 let objectToPlace = 0;
+
 viewCanvas.addEventListener('mousedown', function(e) {
     getCursorPosition(viewCanvas, e)
 })
@@ -46,6 +51,12 @@ function clearElectricFields() {
   ClearCanvas();
 }
 
+function clearMagneticFields() {
+  magneticFields.length=0;
+
+  ClearCanvas();
+}
+
 function getCursorPosition(canvas, event) {
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
@@ -57,6 +68,8 @@ function getCursorPosition(canvas, event) {
   } else if (objectToPlace==1) {
     electricFields.push(new electricField(x,viewCanvas.height-y,spawnEFieldWidth,spawnEFieldHeight,spawnEFieldStrength,spawnEFieldDirection))
 
+  } else if (objectToPlace==2) {
+    magneticFields.push(new magneticField(x,viewCanvas.height-y,spawnMFieldWidth,spawnMFieldHeight,spawnMFieldStrength))
   }
   
   
@@ -81,6 +94,14 @@ function setElectricParameters() {
   spawnEFieldHeight=parseFloat(document.getElementById("eFieldHeight").value);
   spawnEFieldStrength=parseFloat(document.getElementById("eFieldStrength").value);
   spawnEFieldDirection=parseFloat(document.getElementById("eFieldDirection").value);
+
+}
+
+function setMagneticParameters() {
+  objectToPlace=2;
+  spawnMFieldWidth=parseFloat(document.getElementById("mFieldWidth").value);
+  spawnMFieldHeight=parseFloat(document.getElementById("mFieldHeight").value);
+  spawnMFieldStrength=parseFloat(document.getElementById("mFieldStrength").value);
 
 }
 
@@ -128,14 +149,6 @@ class electricField {
   }
 }
 function Start() {
-  
-  let magneticField1 = new magneticField(600,100,100,350,10);
-  let magneticField2 = new magneticField(800,100,100,350,10);
-  magneticFields.push(magneticField1,magneticField2);
-  let electricField1 = new electricField(0,200,300,150,50,1);
-  let electricField2 = new electricField(400,200,300,150,50,1);
-  electricFields.push(electricField1);
-  electricFields.push(electricField2);
   requestAnimationFrame(function() {
     Update(particles,magneticFields,electricFields,performance.now());
   });

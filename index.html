@@ -13,21 +13,28 @@
     <div id="images">
       <img id="positive" src="Positive.png">
       <img id="negative" src="Negative.png">
+      <img id="uparrow" src="UpArrow.png">
+      <img id="rightarrow" src="RightArrow.png">
+      <img id="leftarrow" src="LeftArrow.png">
+      <img id="downarrow" src="DownArrow.png">
+      <img id="cross" src="Cross.png">
+      <img id="dot" src="Dot.png">
+
     </div>
   </canvas>
   <div id="rightInput">
-    <h3>Spawn Particle</h3>
-    <input type="number" placeholder="Charge magnitude" id="chargeMagnitude">
+    <h5>Spawn Particle</h5>
+    <input type="number" placeholder="Charge magnitude (-10,10)" id="chargeMagnitude">
     <br>
-    <input type="number" placeholder="Mass" id="mass">
+    <input type="number" placeholder="Mass (10,500)" id="mass">
     <br>
-    <input type="number" placeholder="Size" id="size">
+    <input type="number" placeholder="Size (0,10)" id="size">
     <br>
-    <input type="number" placeholder="X Velocity" id="xVelocity">
+    <input type="number" placeholder="X Velocity (10,100)" id="xVelocity">
     <br>
-    <input type="number" placeholder="Y Velocity" id="yVelocity">
+    <input type="number" placeholder="Y Velocity (10,100)" id="yVelocity">
     <br>
-    <input type="number" placeholder="Number of particles" id="numParticles">
+    <input type="number" placeholder="Number of particles (1,10000)" id="numParticles">
     <br>
     <input type="button" onclick="setParticleParameters()" value="Set Parameters">
     <br>
@@ -35,12 +42,12 @@
     <br>
     
 
-    <h3>Spawn Electric Field</h3>
-    <input type="number" placeholder="Width" id = "eFieldWidth">
+    <h5>Spawn Electric Field</h5>
+    <input type="number" placeholder="Width (100,1000)" id = "eFieldWidth">
     <br>
-    <input type="number" placeholder="Height" id = "eFieldHeight">
+    <input type="number" placeholder="Height (100,1000)" id = "eFieldHeight">
     <br>
-    <input type="number" placeholder="Strength" id = "eFieldStrength">
+    <input type="number" placeholder="Strength (1,100)" id = "eFieldStrength">
     <br>
     <input type="number" placeholder="Direction (1,2,3,4)" id = "eFieldDirection">
     <br>
@@ -48,12 +55,12 @@
     <br>
     <input type="button" onclick="clearElectricFields()" value="Clear">
     <br>
-    <h3>Spawn Magnetic Field</h3>
-    <input type="number" placeholder="Width" id = "mFieldWidth">
+    <h5>Spawn Magnetic Field</h5>
+    <input type="number" placeholder="Width (100,1000)" id = "mFieldWidth">
     <br>
-    <input type="number" placeholder="Height" id = "mFieldHeight">
+    <input type="number" placeholder="Height (100,1000)" id = "mFieldHeight">
     <br>
-    <input type="number" placeholder="Strength" id = "mFieldStrength">
+    <input type="number" placeholder="Strength (-100,100)" id = "mFieldStrength">
     <br>
     <input type="button" onclick="setMagneticParameters()" value="Set Parameters">
     <br>
@@ -64,6 +71,14 @@
     <input type="button" onclick="toggleCanvasRefresh()" value="Toggle canvas refresh">
     <br>
     <input type="button" onclick="toggleParticleAttraction()" value="Toggle particle attraction ">
+    <br>
+    <input type="button" onclick="removeLastParticle()" value="Remove last particle">
+    <br>
+    <input type="button" onclick="removeLastMField()" value="Remove last magnetic field">
+    <br>
+    <input type="button" onclick="removeLastEField()" value="Remove last electric field">
+    <br>
+    <input type="button" onclick="thanosSnap()" value="Thanos snap">
     <h4 id="numParticlesOutput">Total number of particles: </h4>
     <h4 id="fps">FPS: </h4>
   </div>

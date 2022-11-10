@@ -2,6 +2,12 @@ let viewCanvas = document.getElementById("viewCanvas");
 let viewCanvasCTX = viewCanvas.getContext("2d");
 let positive = document.getElementById("positive");
 let negative = document.getElementById("negative");
+let upArrow = document.getElementById("uparrow");
+let rightArrow = document.getElementById("rightarrow");
+let downArrow = document.getElementById("downarrow");
+let leftArrow = document.getElementById("leftarrow");
+let cross = document.getElementById("cross");
+let dot = document.getElementById("dot");
 let particles = [];
 let magneticFields = [];
 let electricFields = [];
@@ -29,7 +35,7 @@ let spawnMFieldStrength=0;
 
 let objectToPlace = 0;
 
-let particleAttraction = true;
+let particleAttraction = false;
 viewCanvas.addEventListener('mousedown', function(e) {
     getCursorPosition(viewCanvas, e)
 })
@@ -54,7 +60,9 @@ function clearParticles() {
   particles.length=0;
   ClearCanvas();
 }
-
+ function removeLastMField() {
+   magneticFields.pop();
+ }
 function clearElectricFields() {
   electricFields.length=0;
 
@@ -69,11 +77,12 @@ function clearMagneticFields() {
 
 function getCursorPosition(canvas, event) {
   let rect = canvas.getBoundingClientRect();
-  let x = event.clientX - rect.left;
-  let y = event.clientY - rect.top;
+  let x = (event.clientX - rect.left)*(1/.85);
+  let y = (event.clientY - rect.top)*(1/.85);
+  //alert("x "+x+"y "+(viewCanvas.height-y))
   if (objectToPlace==0) {
     for (i=0;i<numParticles;i++) {
-      particles.push(new particle(x +(i/(numParticles/200)),viewCanvas.height-(spawnParticleSize*30)-y,spawnParticleSize*30,spawnParticleSize*30,spawnParticleMass,spawnParticleMagnitude,parseFloat(spawnParticleXVelocity)/10,parseFloat(spawnParticleYVelocity)/10))
+      particles.push(new particle(x+(i*200/numParticles),viewCanvas.height-(spawnParticleSize*30)-y,spawnParticleSize*30,spawnParticleSize*30,spawnParticleMass,spawnParticleMagnitude,parseFloat(spawnParticleXVelocity)/10,parseFloat(spawnParticleYVelocity)/10))
     }
   } else if (objectToPlace==1) {
     electricFields.push(new electricField(x,viewCanvas.height-y,spawnEFieldWidth,spawnEFieldHeight,spawnEFieldStrength,spawnEFieldDirection))
@@ -87,6 +96,52 @@ function getCursorPosition(canvas, event) {
 
 }
 
+function thanosSnap(){
+
+  let itemsToRemove=[];
+
+  for (i=0;i<particles.length;i++) {
+    if (Math.random()>0.5) {
+      itemsToRemove.push(i)
+    }
+    
+  }
+
+  for (i=0;i<itemsToRemove.length;i++) {
+    
+    particles.splice(itemsToRemove[i],1)
+  }
+  itemsToRemove.length=0;
+  for (i=0;i<electricFields.length;i++) {
+    if (Math.random()>0.5) {
+      itemsToRemove.push(i)
+    }
+  }
+
+  for (i=0;i<itemsToRemove.length;i++) {
+    
+    electricFields.splice(itemsToRemove[i],1)
+  }
+  itemsToRemove.length=0;
+  for (i=0;i<magneticFields.length;i++) {
+    if (Math.random()>0.5) {
+      itemsToRemove.push(i)
+    }
+  }
+
+  for (i=0;i<itemsToRemove.length;i++) {
+    
+    magneticFields.splice(itemsToRemove[i],1)
+  }
+  ClearCanvas();
+}
+
+function removeLastEField() {
+  electricFields.pop();
+}
+function removeLastParticle() {
+  particles.pop();
+}
 function setParticleParameters() {
   objectToPlace=0;
   spawnParticleMagnitude = parseFloat(document.getElementById('chargeMagnitude').value);
@@ -159,7 +214,9 @@ class electricField {
   }
 }
 function Start() {
-
+  /*particles.push(new particle(100,100,30,30,1,0,0))
+  particles.push(new particle(200,200,30,30,1,0,0))
+  particles.push(new particle(300,300,30,30,1,0,0))*/
   requestAnimationFrame(function() {
     Update(particles,magneticFields,electricFields,performance.now());
   });
@@ -168,36 +225,89 @@ function Update(particles,magneticFields, electricFields,lastTime) {
 
   currentTime = performance.now()
   deltaTime = (currentTime - lastTime)/40;
-  viewCanvasCTX.fillStyle = "#D3D3D3";
-  viewCanvasCTX.globalAlpha = 0.07;
-  viewCanvasCTX.fillRect(0, 0, viewCanvas.width, viewCanvas.height)
-  viewCanvasCTX.globalAlpha = 1;
+
   if (canvasRefresh) {
     ClearCanvas();
+    viewCanvasCTX.fillStyle = "#D3D3D3";
+    viewCanvasCTX.globalAlpha = 0.2;
+    viewCanvasCTX.fillRect(0, 0, viewCanvas.width, viewCanvas.height)
+    viewCanvasCTX.globalAlpha = 1;
+  } else {
+    viewCanvasCTX.fillStyle = "#D3D3D3";
+    viewCanvasCTX.globalAlpha = 0.07;
+    viewCanvasCTX.fillRect(0, 0, viewCanvas.width, viewCanvas.height)
+    viewCanvasCTX.globalAlpha = 1;
   }
 
 
   viewCanvasCTX.fillStyle = "#FF0000";
   if (canvasRefresh) {
-    viewCanvasCTX.globalAlpha = 0.7;
+    viewCanvasCTX.globalAlpha = 0.5;
   } else {
-    viewCanvasCTX.globalAlpha = 0.2;
+    viewCanvasCTX.globalAlpha = 0.08;
   }
   
   for (let i=0; i<magneticFields.length;i++) {
     viewCanvasCTX.fillRect(magneticFields[i].x, viewCanvas.height-magneticFields[i].height-magneticFields[i].y, magneticFields[i].width, magneticFields[i].height)
+
+    if (magneticFields[i].strength>0){
+      for (let j=0; j<magneticFields[i].width/100;j++) {
+        for (let l=0; l<magneticFields[i].height/100;l++) {
+          viewCanvasCTX.drawImage(cross,magneticFields[i].x+j*100+5, viewCanvas.height-magneticFields[i].height-magneticFields[i].y+l*100+5,90,90)
+        }
+      }
+    }
+
+    if (magneticFields[i].strength<0){
+      for (let j=0; j<magneticFields[i].width/100;j++) {
+        for (let l=0; l<magneticFields[i].height/100;l++) {
+          viewCanvasCTX.drawImage(dot,magneticFields[i].x+j*100+5, viewCanvas.height-magneticFields[i].height-magneticFields[i].y+l*100+5,90,90)
+        }
+      }
+    }
   }
   
   viewCanvasCTX.globalAlpha = 1;
 
   viewCanvasCTX.fillStyle = "#FFF000";
   if (canvasRefresh) {
-    viewCanvasCTX.globalAlpha = 0.7;
+    viewCanvasCTX.globalAlpha = 0.5;
   } else {
-    viewCanvasCTX.globalAlpha = 0.2;
+    viewCanvasCTX.globalAlpha = 0.08;
   }
   for (let i=0; i<electricFields.length;i++) {
     viewCanvasCTX.fillRect(electricFields[i].x, viewCanvas.height-electricFields[i].height-electricFields[i].y, electricFields[i].width, electricFields[i].height)
+    if (electricFields[i].direction==1){
+      for (let j=0; j<electricFields[i].width/100;j++) {
+        for (let l=0; l<electricFields[i].height/100;l++) {
+          viewCanvasCTX.drawImage(upArrow,electricFields[i].x+j*100+5, viewCanvas.height-electricFields[i].height-electricFields[i].y+l*100+5,90,90)
+        }
+      }
+    }
+
+    if (electricFields[i].direction==2){
+      for (let j=0; j<electricFields[i].width/100;j++) {
+        for (let l=0; l<electricFields[i].height/100;l++) {
+          viewCanvasCTX.drawImage(rightArrow,electricFields[i].x+j*100+5, viewCanvas.height-electricFields[i].height-electricFields[i].y+l*100+5,90,90)
+        }
+      }
+    }
+
+    if (electricFields[i].direction==3){
+      for (let j=0; j<electricFields[i].width/100;j++) {
+        for (let l=0; l<electricFields[i].height/100;l++) {
+          viewCanvasCTX.drawImage(downArrow,electricFields[i].x+j*100+5, viewCanvas.height-electricFields[i].height-electricFields[i].y+l*100+5,90,90)
+        }
+      }
+    }
+
+    if (electricFields[i].direction==4){
+      for (let j=0; j<electricFields[i].width/100;j++) {
+        for (let l=0; l<electricFields[i].height/100;l++) {
+          viewCanvasCTX.drawImage(leftArrow,electricFields[i].x+j*100+5, viewCanvas.height-electricFields[i].height-electricFields[i].y+l*100+5,90,90)
+        }
+      }
+    }
   }
   
   
@@ -208,10 +318,13 @@ function Update(particles,magneticFields, electricFields,lastTime) {
     if (particleAttraction) {
       for (let l=0; l<particles.length;l++) {
         if (l!=i) {
-          particles[i] = calculateForceOfTwoCharges(particles[i],particles[l]);
+          particles[i] = calculateForceOfTwoCharges(particles[i],particles[l],deltaTime);
+
         }
       }
     }
+
+
     
     for (let j=0; j<4; j++) {
 
@@ -220,7 +333,20 @@ function Update(particles,magneticFields, electricFields,lastTime) {
       
       particles[i] = UpdateVelocities(particles[i],magneticFields,electricFields,deltaTime/4);
 
-      
+      if (particles[i].xVelocity>50 && particles[i].xVelocity>0) {
+        particles[i].xVelocity=50;
+      }
+      if (particles[i].yVelocity>50 && particles[i].yVelocity>0) {
+        particles[i].yVelocity=50
+      }
+  
+      if (particles[i].xVelocity<-50 && particles[i].xVelocity<0) {
+        particles[i].xVelocity=-50;
+      }
+      if (particles[i].yVelocity<-50 && particles[i].yVelocity<0) {
+        particles[i].yVelocity=-50
+      }
+
       
       
       particles[i].x+=particles[i].xVelocity*deltaTime/4;
@@ -284,9 +410,9 @@ function UpdateVelocities(particle1, magneticFields,electricFields,deltaTime) {
       if (particle1.inElectricField[j].direction==1) {
         particle1.yVelocity += (particle1.inElectricField[j].strength * particle1.charge)/particle1.mass;
       } else if (particle1.inElectricField[j].direction==2) {
-        particle1.yVelocity -= (particle1.inElectricField[j].strength * particle1.charge)/particle1.mass;
-      } else if (particle1.inElectricField[j].direction==3) {
         particle1.xVelocity += (particle1.inElectricField[j].strength * particle1.charge)/particle1.mass;
+      } else if (particle1.inElectricField[j].direction==3) {
+        particle1.yVelocity -= (particle1.inElectricField[j].strength * particle1.charge)/particle1.mass;
       } else if (particle1.inElectricField[j].direction==4) {
         particle1.xVelocity -= (particle1.inElectricField[j].strength * particle1.charge)/particle1.mass;
       }
@@ -315,24 +441,34 @@ function wallCollision(particle1) {
   return particle1
 }
 
-function calculateForceOfTwoCharges(particle1,particle2) {
-  let charges = -(particle1.charge*particle2.charge)*1000
-  let distance = (Math.sqrt((Math.abs((particle2.x-particle1.x)**2))+Math.abs(((particle2.y-particle2.x)**2))))
-  let acceleration = (charges/distance/particle1.mass);
+function calculateForceOfTwoCharges(particle1,particle2,deltaTime) {
+
+  let charges = -(particle1.charge*particle2.charge)*500000
+
+  let distance = (Math.sqrt((((particle2.x-particle1.x))**2)+((particle2.y-particle1.y)**2)))
+  let acceleration = ((charges/(distance**2))/particle1.mass);
+  if (acceleration>1) {
+    acceleration = 1;
+  }
+  console.log(distance)
   let angle = Math.abs(Math.atan((particle2.y-particle1.y)/(particle2.x-particle1.x)))
+
+  
   if (particle1.x>particle2.x) {
-    particle1.xVelocity += -acceleration * Math.cos(angle)
-  } else {
-    particle1.xVelocity += acceleration * Math.cos(angle)
+    particle1.xVelocity += -acceleration * Math.cos(angle) * deltaTime
+  } else if (particle1.x<particle2.x) {
+    particle1.xVelocity += acceleration * Math.cos(angle) * deltaTime
   }
   
 
-
+  
   if (particle1.y>particle2.y) {
-    particle1.yVelocity += -acceleration * Math.sin(angle)
-  } else {
-    particle1.yVelocity += acceleration * Math.sin(angle)
+    particle1.yVelocity += -acceleration * Math.sin(angle) * deltaTime
+  } else if (particle1.y<particle2.y) {
+    particle1.yVelocity += acceleration * Math.sin(angle) * deltaTime
   }
+  
+  
   
 
   return (particle1)

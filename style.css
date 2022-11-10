@@ -18,3 +18,14 @@ html, body {
   top: 5px;
   right: 5px;
 }
+
+h5 {
+  margin:0px;
+}
+
+input {
+  width:200px;
+}
+body {
+  zoom: 0.85; 
+}

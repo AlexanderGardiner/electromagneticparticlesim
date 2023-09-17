@@ -6,4 +6,6 @@
 <li>Magnetic field simulation including varying charges</li></li>
 <li>Electric field simulation including varying charges</li>
 <br>
-
+<h4>Demo Link:</h4>
+<a href="https://electromagneticparticles.alexgardiner.repl.co">electromagneticparticles.alexgardiner.repl.co></a>
+<br>
